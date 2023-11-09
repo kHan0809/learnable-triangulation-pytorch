@@ -79,7 +79,9 @@ def setup_human36m_dataloaders(config, is_train, distributed_train):
             worker_init_fn=dataset_utils.worker_init_fn,
             pin_memory=True
         )
-
+        print(train_dataset,"====================")
+        next(iter(train_dataset))
+        raise
     # val
     val_dataset = human36m.Human36MMultiViewDataset(
         h36m_root=config.dataset.val.h36m_root,
@@ -131,7 +133,7 @@ def setup_experiment(config, model_name, is_train=True):
 
     experiment_title = prefix + experiment_title
 
-    experiment_name = '{}@{}'.format(experiment_title, datetime.now().strftime("%d.%m.%Y-%H:%M:%S"))
+    experiment_name = '{}/{}'.format(experiment_title, datetime.now().strftime("%d.%m.%Y-%H.%M.%S"))
     print("Experiment name: {}".format(experiment_name))
 
     experiment_dir = os.path.join(args.logdir, experiment_name)
@@ -168,7 +170,6 @@ def one_epoch(model, criterion, opt, config, dataloader, device, epoch, n_iters_
     grad_context = torch.autograd.enable_grad if is_train else torch.no_grad
     with grad_context():
         end = time.time()
-
         iterator = enumerate(dataloader)
         if is_train and config.opt.n_iters_per_epoch is not None:
             iterator = islice(iterator, config.opt.n_iters_per_epoch)
@@ -391,7 +392,7 @@ def main(args):
     if is_distributed:
         device = torch.device(args.local_rank)
     else:
-        device = torch.device(0)
+        device = torch.device("cuda:0")
 
     # config
     config = cfg.load_config(args.config)

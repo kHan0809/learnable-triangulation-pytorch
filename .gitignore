@@ -107,4 +107,8 @@ venv.bak/
 *.pth
 *.jpg
 *.json
+*.mat
+*.h5
+*.npy
+
 
